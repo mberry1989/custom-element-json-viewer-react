@@ -56,7 +56,7 @@ export const IntegrationApp: FC = () => {
      // initialize delivery client
      const deliveryClient = createDeliveryClient({
       environmentId: projectId || '',
-      previewApiKey: process.env.PREVIEW_KEY || '',
+      previewApiKey: process.env.REACT_APP_PREVIEW_KEY || '',
         defaultQueryConfig: {
           usePreviewMode: true
         }
