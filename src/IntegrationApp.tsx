@@ -67,7 +67,13 @@ export const IntegrationApp: FC = () => {
 
     const file = assetArr.data.item.elements['export_data']?.value[0].url
 
-    setElementValue(file)
+
+    const results = () => {fetch(file)
+      .then(response => response.json())
+      .then(json => setElementValue(json))
+      .catch(error => console.error(error));
+    }
+    results();
     }
   }
 
