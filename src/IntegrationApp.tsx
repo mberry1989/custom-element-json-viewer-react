@@ -94,32 +94,12 @@ export const IntegrationApp: FC = () => {
 
   return (
     <>
-      <h1>
-        This is a great integration with the Kontent.ai app.
-      </h1>
       <section>
         get asset JSON
         <button onClick={getFileJSON}>Select different items</button>
       </section>
       <section>
-        projectId: {projectId}; item name: {itemName}
-      </section>
-      <section>
-        configuration: {JSON.stringify(config)}
-      </section>
-      <section>
         <input value={elementValue} onChange={e => updateValue(e.target.value)} disabled={isDisabled} />
-      </section>
-      <section>
-        This is the watched element: {watchedElementValue}
-      </section>
-      <section>
-        These are your selected asset names: {selectedAssetNames.join(', ')}
-        <button onClick={selectAssets}>Select different assets</button>
-      </section>
-      <section>
-        These are your selected item names: {selectedItemNames.join(', ')}
-        <button onClick={selectItems}>Select different items</button>
       </section>
     </>
   );
