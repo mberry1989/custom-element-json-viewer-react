@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
+import { createDeliveryClient } from '@kontent-ai/delivery-sdk';
 
 export const IntegrationApp: FC = () => {
   const [config, setConfig] = useState<Config | null>(null);
@@ -9,6 +10,7 @@ export const IntegrationApp: FC = () => {
   const [selectedAssetNames, setSelectedAssetNames] = useState<ReadonlyArray<string>>([]);
   const [selectedItemNames, setSelectedItemNames] = useState<ReadonlyArray<string>>([]);
   const [elementValue, setElementValue] = useState<string | null>(null);
+  const [itemCodename, setItemCodename] = useState<string | null>(null);
 
   const updateWatchedElementValue = useCallback((codename: string) => {
     CustomElement.getElementValue(codename, v => typeof v === 'string' && setWatchedElementValue(v));
@@ -26,6 +28,7 @@ export const IntegrationApp: FC = () => {
       setItemName(context.item.name);
       setElementValue(element.value ?? '');
       updateWatchedElementValue(element.config.textElementCodename);
+      setItemCodename(context.item.codename);
     });
   }, [updateWatchedElementValue]);
 
@@ -47,6 +50,28 @@ export const IntegrationApp: FC = () => {
     }
     CustomElement.observeElementChanges([config.textElementCodename], () => updateWatchedElementValue(config.textElementCodename));
   }, [config, updateWatchedElementValue]);
+
+  const getFileJSON = async () => {
+    if(projectId && itemCodename){
+     // initialize delivery client
+     const deliveryClient = createDeliveryClient({
+      environmentId: projectId || '',
+      previewApiKey: process.env.PREVIEW_KEY || '',
+        defaultQueryConfig: {
+          usePreviewMode: true
+        }
+    })
+
+    const assetArr = await deliveryClient.item(itemCodename)
+      .depthParameter(0)
+      .elementsParameter(['export_data'])
+      .toPromise()
+
+    const file = assetArr.data.item.elements['export_data']?.value[0].url
+
+    setElementValue(file)
+    }
+  }
 
   const selectAssets = () =>
     CustomElement.selectAssets({ allowMultiple: true, fileType: 'all' })
@@ -72,6 +97,10 @@ export const IntegrationApp: FC = () => {
       <h1>
         This is a great integration with the Kontent.ai app.
       </h1>
+      <section>
+        get asset JSON
+        <button onClick={getFileJSON}>Select different items</button>
+      </section>
       <section>
         projectId: {projectId}; item name: {itemName}
       </section>
