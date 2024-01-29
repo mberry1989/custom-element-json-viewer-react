@@ -7,8 +7,6 @@ export const IntegrationApp: FC = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [itemName, setItemName] = useState<string | null>(null);
   const [watchedElementValue, setWatchedElementValue] = useState<string | null>(null);
-  const [selectedAssetNames, setSelectedAssetNames] = useState<ReadonlyArray<string>>([]);
-  const [selectedItemNames, setSelectedItemNames] = useState<ReadonlyArray<string>>([]);
   const [elementValue, setElementValue] = useState<string | null>(null);
   const [itemCodename, setItemCodename] = useState<string | null>(null);
 
@@ -72,16 +70,6 @@ export const IntegrationApp: FC = () => {
     setElementValue(file)
     }
   }
-
-  const selectAssets = () =>
-    CustomElement.selectAssets({ allowMultiple: true, fileType: 'all' })
-      .then(ids => CustomElement.getAssetDetails(ids?.map(i => i.id) ?? []))
-      .then(assets => setSelectedAssetNames(assets?.map(asset => asset.name) ?? []));
-
-  const selectItems = () =>
-    CustomElement.selectItems({ allowMultiple: true })
-      .then(ids => CustomElement.getItemDetails(ids?.map(i => i.id) ?? []))
-      .then(items => setSelectedItemNames(items?.map(item => item.name) ?? []));
 
   const updateValue = (newValue: string) => {
     CustomElement.setValue(newValue);
