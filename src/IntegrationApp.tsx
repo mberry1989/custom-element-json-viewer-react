@@ -64,7 +64,7 @@ export const IntegrationApp: FC = () => {
 
     const results = () => {fetch(file)
       .then(response => response.json())
-      .then(json => setElementValue(JSON.stringify(json)))
+      .then(json => setElementValue(json))
       .catch(error => console.error(error));
     }
     results();
