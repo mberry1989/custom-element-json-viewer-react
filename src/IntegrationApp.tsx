@@ -78,11 +78,10 @@ export const IntegrationApp: FC = () => {
   return (
     <>
       <section>
-        get asset JSON
         <button onClick={getFileJSON}>View Export JSON</button>
       </section>
       <section>
-        <pre>{elementValue}</pre>
+        <pre>{JSON.stringify(elementValue, null, 2)}</pre>
       </section>
     </>
   );
