@@ -4,7 +4,6 @@ import { createDeliveryClient } from '@kontent-ai/delivery-sdk';
 export const IntegrationApp: FC = () => {
   const [config, setConfig] = useState<Config | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [isDisabled, setIsDisabled] = useState(false);
   const [itemName, setItemName] = useState<string | null>(null);
   const [watchedElementValue, setWatchedElementValue] = useState<string | null>(null);
   const [elementValue, setElementValue] = useState<string | null>(null);
@@ -22,7 +21,6 @@ export const IntegrationApp: FC = () => {
 
       setConfig(element.config);
       setProjectId(context.projectId);
-      setIsDisabled(element.disabled);
       setItemName(context.item.name);
       setElementValue(element.value ?? '');
       updateWatchedElementValue(element.config.textElementCodename);
@@ -31,11 +29,7 @@ export const IntegrationApp: FC = () => {
   }, [updateWatchedElementValue]);
 
   useEffect(() => {
-    CustomElement.setHeight(500);
-  }, []);
-
-  useEffect(() => {
-    CustomElement.onDisabledChanged(setIsDisabled);
+    CustomElement.setHeight(800);
   }, []);
 
   useEffect(() => {
@@ -77,11 +71,6 @@ export const IntegrationApp: FC = () => {
     }
   }
 
-  const updateValue = (newValue: string) => {
-    CustomElement.setValue(newValue);
-    setElementValue(newValue);
-  };
-
   if (!config || !projectId || elementValue === null || watchedElementValue === null || itemName === null) {
     return null;
   }
@@ -90,10 +79,10 @@ export const IntegrationApp: FC = () => {
     <>
       <section>
         get asset JSON
-        <button onClick={getFileJSON}>Select different items</button>
+        <button onClick={getFileJSON}>View Export JSON</button>
       </section>
       <section>
-        <input value={elementValue} onChange={e => updateValue(e.target.value)} disabled={isDisabled} />
+        <pre>{elementValue}</pre>
       </section>
     </>
   );
