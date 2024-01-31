@@ -1,17 +1,11 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { createDeliveryClient } from '@kontent-ai/delivery-sdk';
 
 export const IntegrationApp: FC = () => {
   const [config, setConfig] = useState<Config | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [itemName, setItemName] = useState<string | null>(null);
-  const [watchedElementValue, setWatchedElementValue] = useState<string | null>(null);
   const [elementValue, setElementValue] = useState<string | null>(null);
   const [itemCodename, setItemCodename] = useState<string | null>(null);
-
-  const updateWatchedElementValue = useCallback((codename: string) => {
-    CustomElement.getElementValue(codename, v => typeof v === 'string' && setWatchedElementValue(v));
-  }, []);
 
   useEffect(() => {
     CustomElement.init((element, context) => {
@@ -21,29 +15,20 @@ export const IntegrationApp: FC = () => {
 
       setConfig(element.config);
       setProjectId(context.projectId);
-      setItemName(context.item.name);
       setElementValue(element.value ?? '');
-      updateWatchedElementValue(element.config.textElementCodename);
       setItemCodename(context.item.codename);
     });
-  }, [updateWatchedElementValue]);
+  }, []);
 
   useEffect(() => {
     CustomElement.setHeight(800);
   }, []);
 
-  useEffect(() => {
-    CustomElement.observeItemChanges(i => setItemName(i.name));
-  }, []);
-
-  useEffect(() => {
-    if (!config) {
-      return;
-    }
-    CustomElement.observeElementChanges([config.textElementCodename], () => updateWatchedElementValue(config.textElementCodename));
-  }, [config, updateWatchedElementValue]);
-
   const getFileJSON = async () => {
+    if(!config){
+      return null;
+    }
+
     if(projectId && itemCodename){
      // initialize delivery client
      const deliveryClient = createDeliveryClient({
@@ -56,11 +41,10 @@ export const IntegrationApp: FC = () => {
 
     const assetArr = await deliveryClient.item(itemCodename)
       .depthParameter(0)
-      .elementsParameter(['export_data'])
+      .elementsParameter([config.dataElementCodename])
       .toPromise()
 
-    const file = assetArr.data.item.elements['export_data']?.value[0].url
-
+    const file = assetArr.data.item.elements[config.dataElementCodename]?.value[0].url
 
     const results = () => {fetch(file)
       .then(response => response.json())
@@ -71,7 +55,7 @@ export const IntegrationApp: FC = () => {
     }
   }
 
-  if (!config || !projectId || elementValue === null || watchedElementValue === null || itemName === null) {
+  if (!config || !projectId || elementValue === null) {
     return null;
   }
 
@@ -91,14 +75,14 @@ IntegrationApp.displayName = 'IntegrationApp';
 
 type Config = Readonly<{
   // expected custom element's configuration
-  textElementCodename: string;
+  dataElementCodename: string;
 }>;
 
 // check it is the expected configuration
 const isConfig = (v: unknown): v is Config =>
   isObject(v) &&
-  hasProperty(nameOf<Config>('textElementCodename'), v) &&
-  typeof v.textElementCodename === 'string';
+  hasProperty(nameOf<Config>('dataElementCodename'), v) &&
+  typeof v.dataElementCodename === 'string';
 
 const hasProperty = <PropName extends string, Input extends {}>(propName: PropName, v: Input): v is Input & { [key in PropName]: unknown } =>
   v.hasOwnProperty(propName);
